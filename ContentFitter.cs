@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+// Token: 0x020000AE RID: 174
+public class ContentFitter : MonoBehaviour
+{
+	// Token: 0x0600038E RID: 910 RVA: 0x0000E201 File Offset: 0x0000C401
+	private void LateUpdate()
+	{
+		if (this.continuousUpdate)
+		{
+			this.continuousUpdate = false;
+			this.Fit();
+		}
+	}
+
+	// Token: 0x0600038F RID: 911 RVA: 0x0000E218 File Offset: 0x0000C418
+	public void Fit()
+	{
+		this.transforms.Clear();
+		foreach (RectTransform rectTransform in base.GetComponentsInChildren<RectTransform>())
+		{
+			if (rectTransform != base.GetComponent<RectTransform>())
+			{
+				this.transforms.Add(rectTransform);
+			}
+		}
+		Vector2 vector = new Vector2(1E+09f, -1E+09f);
+		Vector2 vector2 = new Vector2(-1E+09f, 1E+09f);
+		foreach (RectTransform rectTransform2 in this.transforms)
+		{
+			Vector2 vector3 = new Vector2(rectTransform2.localPosition.x - rectTransform2.sizeDelta.x * rectTransform2.pivot.x, rectTransform2.localPosition.y + rectTransform2.sizeDelta.y * rectTransform2.pivot.y);
+			Vector2 vector4 = new Vector2(rectTransform2.localPosition.x + rectTransform2.sizeDelta.x * (1f - rectTransform2.pivot.x), rectTransform2.localPosition.y - rectTransform2.sizeDelta.y * (1f - rectTransform2.pivot.y));
+			if (vector3.x < vector.x)
+			{
+				vector.x = vector3.x;
+			}
+			if (vector3.y > vector.y)
+			{
+				vector.y = vector3.y;
+			}
+			if (vector4.y < vector2.y)
+			{
+				vector2.y = vector4.y;
+			}
+			if (vector4.x > vector2.x)
+			{
+				vector2.x = vector4.x;
+			}
+		}
+		Vector2 sizeDelta = new Vector2(Mathf.Abs(vector.x - vector2.x), Mathf.Abs(vector.y - vector2.y));
+		this.targetTransform.localPosition = vector;
+		this.targetTransform.sizeDelta = sizeDelta;
+	}
+
+	// Token: 0x04000332 RID: 818
+	public bool continuousUpdate;
+
+	// Token: 0x04000333 RID: 819
+	public RectTransform targetTransform;
+
+	// Token: 0x04000334 RID: 820
+	private List<RectTransform> transforms = new List<RectTransform>();
+}
